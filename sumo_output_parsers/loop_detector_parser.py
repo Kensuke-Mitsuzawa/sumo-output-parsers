@@ -1,8 +1,10 @@
 import dataclasses
 from pathlib import Path
 from typing import Optional, List
-from itertools import groupby
+import pickle
+from tqdm import tqdm
 
+from scipy.sparse import csr_matrix
 import numpy
 
 from sumo_output_parsers.logger_unit import logger
@@ -12,11 +14,17 @@ from sumo_output_parsers.models.matrix import MatrixObject
 
 @dataclasses.dataclass
 class LoopDetectorMatrixObject(MatrixObject):
-    matrix: numpy.ndarray
+    matrix: csr_matrix
     detectors: numpy.ndarray
     interval_begins: numpy.ndarray
     interval_end: numpy.ndarray
     value_type: str
+
+    @classmethod
+    def from_pickle(self, path_pickle: Path) -> "LoopDetectorMatrixObject":
+        with path_pickle.open('rb') as f:
+            data = pickle.load(f)
+        return LoopDetectorMatrixObject(**data)
 
 
 class LoopDetectorParser(ParserClass):
@@ -26,6 +34,8 @@ class LoopDetectorParser(ParserClass):
     """
     def __init__(self, path_file: Path):
         super(LoopDetectorParser, self).__init__(path_file)
+        self.name_interval_node = 'interval'
+        self.pre_defined_attribute = ['begin', 'end', 'id']
 
     def __repr__(self):
         return self.__str__()
@@ -33,19 +43,35 @@ class LoopDetectorParser(ParserClass):
     def __str__(self):
         return f'ResultFile class for {self.path_file}'
 
+    def get_attributes(self, is_traverse_all: bool = False) -> List[str]:
+        max_search = 10
+        metrics = []
+        for search_i, elem in enumerate(self.getelements(str(self.path_file), self.name_interval_node)):
+            if is_traverse_all is False and search_i == max_search:
+                return list(set(metrics))
+            # end if
+            item_list = [e for e in elem.attrib.keys() if e not in self.pre_defined_attribute]
+            metrics += item_list
+        # end for
+        return list(set(metrics))
+
     def xml2matrix(self, target_element: str) -> LoopDetectorMatrixObject:
         """generates matrix object with the specified key name.
         :param target_element: a name of key which corresponds to values of the matrix.
         :return: MatrixObject
         """
         stacks = []
-        __time_interval: Optional[float] = None
-        for elem in root_soup.find_all('interval'):
-            detector_id = elem.get('id')
-            time_begin = float(elem.get('begin'))
-            time_end = float(elem.get('end'))
-
-            obj_value = elem.get(target_element)
+        detector_ids = []
+        time_interval_begin = []
+        time_interval_end = []
+        time_interval = 0
+        logger.info('Parsing loop xml...')
+        for elem in tqdm(self.getelements(str(self.path_file), tag=self.name_interval_node)):
+            time_interval += 1
+            detector_id: str = elem.get('id')
+            time_begin: str = elem.get('begin')
+            time_end: str = elem.get('end')
+            obj_value = float(elem.get(target_element))
             try:
                 if obj_value == '':
                     target_value = 0.0
@@ -59,34 +85,36 @@ class LoopDetectorParser(ParserClass):
                 keys = elem.attrs.keys()
                 raise KeyError(f'Invalid key name. Available keys are {keys}')
             # end try
-            stacks.append([detector_id, time_begin, time_end, target_value])
+            time_interval_begin.append(time_begin)
+            time_interval_end.append(time_end)
+            detector_ids.append(detector_id)
+            stacks.append((time_begin, detector_id, target_value))
         # end for
-        seq_detector_id = []
-        matrix_stack = []
-        seq_begin = []
-        seq_end = []
-        for detector_id, g_obj in groupby(sorted(stacks, key=lambda t: t[0]), key=lambda t: t[0]):
-            __ = list(sorted([t for t in g_obj], key=lambda t: t[1]))
-            seq_begin = [t[1] for t in __]
-            seq_end = [t[2] for t in __]
-            seq_value = [t[3] for t in __]
-            seq_detector_id.append(detector_id)
-            matrix_stack.append(seq_value)
-        # end for
-        detectors = numpy.array(seq_detector_id)
 
-        begin_time_vector = numpy.array(seq_begin)
-        end_time_vector = numpy.array(seq_end)
-        matrix_value = self.matrix_with_autofill(matrix_stack)
-        assert len(matrix_value.shape) == 2, f'The method expects 2nd array. But it detects {matrix_value.shape} object. ' \
-                                             f'Check your xml file at {self.path_file}'
+        time2id = self.generate_time2id(time_interval_begin) \
+            if self.detect_data_type_time(time_interval_begin) else None
+        det_ids = list(sorted(list(set(detector_ids))))
+        logger.info(f'Parsing done. n-time-interval={time_interval} detector-ids={len(det_ids)}')
+        detector2id = {car_id: i for i, car_id in enumerate(det_ids)}
+        metric_matrix = self.generate_csr_matrix(
+            data_stack=stacks,
+            row_index2id=detector2id,
+            data_index2id=None,
+            time_interval=time_interval,
+            col_index2id=time2id
+        )
+        detectors = numpy.array(det_ids)
+        begin_time_vector = numpy.array(time_interval_begin)
+        end_time_vector = numpy.array(time_interval_end)
+        assert len(metric_matrix.shape) == 2, f'The method expects 2nd array. But it detects {metric_matrix.shape} object. ' \
+                                              f'Check your xml file at {self.path_file}'
         return LoopDetectorMatrixObject(
-            matrix=matrix_value,
+            matrix=metric_matrix,
             detectors=detectors,
             interval_begins=begin_time_vector,
             interval_end=end_time_vector,
             value_type=target_element)
 
     def to_array_objects(self, aggregation_on: str) -> MatrixObject:
-        matrix_obj = self.xml2matrix(root_soup=self.tree_object, target_element=aggregation_on)
+        matrix_obj = self.xml2matrix(target_element=aggregation_on)
         return matrix_obj

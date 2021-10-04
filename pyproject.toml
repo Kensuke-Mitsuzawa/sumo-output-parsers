@@ -1,12 +1,11 @@
 [tool.poetry]
 name = "sumo_output_parsers
 version = "0.1"
-description = ""
+description = "Fast and lightweight file parsers for SUMO(traffic simulator) output"
 authors = ["Kensuke Mitsuzawa <kensuke.mit@gmail.com>"]
 maintainers = ["Kensuke Mitsuzawa <kensuke.mit@gmail.com>"]
 license = "MIT"
 readme = "README.md"
-documentation = ""
 
 [tool.poetry.dependencies]
 python = "^3.6.1"
@@ -20,6 +19,7 @@ h5py = "*"
 tabulate = "*"
 pandas = "*"
 tqdm = "^4.61.2"
+more_itertools = "*"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.3"
