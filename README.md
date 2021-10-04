@@ -15,6 +15,8 @@ This package provides an easy-to-call python interface to obtain matrix form fro
 - easy-to-call python interfaces to obtain matrix form from SUMO xml files
 - easy-to-call python interfaces to visualize SUMO simulations
 
+![Example of animation](https://user-images.githubusercontent.com/1772712/135924848-4a938dd2-b2d3-4dfe-bfd6-94904086c382.gif)
+
 # Sample
 
 See `sample.py`
