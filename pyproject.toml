@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "sumo_output_parsers
+name = "sumo_output_parsers"
 version = "0.1"
 description = "Fast and lightweight file parsers for SUMO(traffic simulator) output"
 authors = ["Kensuke Mitsuzawa <kensuke.mit@gmail.com>"]
