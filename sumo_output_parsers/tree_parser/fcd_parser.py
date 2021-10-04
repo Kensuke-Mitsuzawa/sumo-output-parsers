@@ -22,7 +22,6 @@ class FcdMatrixObject(MatrixObject):
     value_type: str
     interval_end: Optional[np.ndarray] = None
 
-
     @classmethod
     def from_pickle(self, path_pickle: Path) -> "FcdMatrixObject":
         with path_pickle.open('rb') as f:
@@ -60,45 +59,52 @@ class FCDFileParser(ParserClass):
         """
         route_stack = []
         car_ids = []
-        lane_ids = []
+        values = []
         seq_begin = []
         time_interval = 0
         __time_interval: Optional[float] = None
         logger.info('Parsing FCD xml...')
         __car_ids = []
-        __lane_ids = []
+        __values = []
         for elem in tqdm(self.getelements(str(self.path_file), tag=self.name_time_node)):
             seq_begin.append(elem.attrib['time'])
             time_interval += 1
             element_time_interval = []
             __car_ids = []
-            __lane_ids = []
+            __values = []
             for vehicle_tree in elem.findall('vehicle'):
-                __lane_ids.append(vehicle_tree.attrib[target_element])
+                __values.append(vehicle_tree.attrib[target_element])
                 __car_ids.append(vehicle_tree.attrib['id'])
                 element_time_interval.append(
                     (time_interval, vehicle_tree.attrib['id'], vehicle_tree.attrib[target_element]))
             # end for
             car_ids += list(set(__car_ids))
-            lane_ids += list(set(__lane_ids))
+            values += list(set(__values))
             route_stack += element_time_interval
         # end for
-        del __lane_ids
+        del __values
         del __car_ids
 
-        assert len(car_ids) > 0 and len(lane_ids) > 0 and len(route_stack) > 0, 'Nothing extracted from the FCD output.'
-
+        assert len(car_ids) > 0 and len(values) > 0 and len(route_stack) > 0, 'Nothing extracted from the FCD output.'
         car_ids = list(sorted(list(set(car_ids))))
-        lane_ids = list(sorted(list(set(lane_ids))))
-        logger.info(f'Parsing done. n-time-interval={time_interval} car-types={len(car_ids)} value-types={len(lane_ids)}')
+        values = list(sorted(list(set(values))))
+        logger.info(f'Parsing done. n-time-interval={time_interval} car-types={len(car_ids)} value-types={len(values)}')
         # convert lane-id & car-id into integer
         car2id = {car_id: i for i, car_id in enumerate(car_ids)}
-        lane2id = {lane_id: i for i, lane_id in enumerate(lane_ids)}
+        value_type = self.detect_data_type(values)
+        if value_type == str:
+            values2id = {lane_id: i for i, lane_id in enumerate(values)}
+        elif value_type == float or value_type == int:
+            values2id = None
+            route_stack = [(t[0], t[1], value_type(t[2])) for t in route_stack]
+        else:
+            raise NotImplementedError('undefined case.')
+        # end if
         time2id = None
         lane_matrix = self.generate_csr_matrix(
             data_stack=route_stack,
             row_index2id=car2id,
-            data_index2id=lane2id,
+            data_index2id=values2id,
             time_interval=time_interval,
             col_index2id=time2id
         )
@@ -108,7 +114,7 @@ class FCDFileParser(ParserClass):
                                             f'Check your xml file at {self.path_file}'
         return FcdMatrixObject(
             matrix=lane_matrix,
-            value2id=lane2id,
+            value2id=values2id,
             car2id=car2id,
             interval_begins=begin_time_vector,
             value_type=target_element)

@@ -54,6 +54,29 @@ class ParserClass(object):
         return time_dtype
 
     @staticmethod
+    def detect_data_type(data_sequence: List[Union[str, int]],
+                         is_traverse_all: bool = False) -> object:
+        max_search = 10
+        _dtype = str
+        for i, t in enumerate(data_sequence):
+            try:
+                float(t)
+                _dtype = float
+            except:
+                try:
+                    int(t)
+                    _dtype = int
+                except:
+                    _dtype = str
+                # end try
+            # end try
+            if is_traverse_all is False and i == max_search:
+                return _dtype
+            # end if
+        # end for
+        return _dtype
+
+    @staticmethod
     def generate_csr_matrix(data_stack: List[Tuple[str, str, Union[str, int, float]]],
                             row_index2id: Dict[str, int],
                             time_interval: int,
