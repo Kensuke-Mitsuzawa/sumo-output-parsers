@@ -61,7 +61,7 @@ class TrafficAnimationVisualizer(object):
                            intervals: int = -1,
                            is_keep_png_dir: bool = False,
                            frames_auto_adjustment: int = 100,
-                           n_parallel: int = -1):
+                           n_parallel: int = 4):
         assert path_video_output.parent.exists()
 
         length_time_intervals = self.x_position_matrix.matrix.shape[1]
