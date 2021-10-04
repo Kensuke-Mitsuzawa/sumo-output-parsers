@@ -27,7 +27,7 @@ class ParserClass(object):
         Args:
             path_file: pathlib.Path object that leads into output file path
         """
-        assert path_file.exists()
+        assert path_file.exists(), f'No input file named {path_file}'
         self.path_file = path_file
 
     @staticmethod
