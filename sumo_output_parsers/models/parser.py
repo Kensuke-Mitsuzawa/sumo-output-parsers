@@ -1,13 +1,22 @@
+import urllib.parse
 from pathlib import Path
 from typing import Optional, List, Union, Dict, Tuple
 from scipy.sparse import csr_matrix
 from lxml import etree
+from tempfile import mkdtemp
 import more_itertools
+import os
+import sys
+import subprocess
+import time
+import pandas
 
 import numpy as np
+import requests
 
 from sumo_output_parsers.models.matrix import MatrixObject
 from sumo_output_parsers.logger_unit import logger
+from sumo_output_parsers.models import statics
 
 
 class ParserClass(object):
@@ -123,3 +132,129 @@ class ParserClass(object):
 
     def __str__(self):
         return f'ResultFile class for {self.path_file}'
+
+
+class CsvBasedParser(ParserClass):
+    def __init__(self,
+                 path_xml_file: Path,
+                 name_xsd: str,
+                 index_header_name: str,
+                 column_header_name: str,
+                 path_working_dir: Optional[Path],
+                 path_default_sumo_home: Path = statics.PATH_DEFAULT_SUMO_HOME):
+        super(CsvBasedParser, self).__init__(path_file=path_xml_file)
+        self.name_xsd = name_xsd
+        if path_working_dir is None:
+            self.path_working_dir = Path(mkdtemp())
+            self.path_basic_xsd = self.get_basic_xsd_file()
+            self.path_xsd = self.get_xsd_schema_file(name_xsd)
+        else:
+            self.path_working_dir = path_working_dir
+            self.path_basic_xsd = path_working_dir.joinpath(statics.NAME_BASE_TYPES)
+            self.path_xsd = path_working_dir.joinpath(name_xsd)
+            assert self.path_basic_xsd.exists()
+            assert self.path_xsd.exists()
+        # end if
+        self.path_target_script = self.check_sumo_script(path_default_sumo_home)
+        self.path_python_interpreter = Path(sys.executable)
+        self.path_tmp_csv: Optional[Path] = None
+        self.separator = ';'
+        self.index_header_name = index_header_name
+        self.column_header_name = column_header_name
+
+    @staticmethod
+    def check_sumo_script(default_sumo_home: Path) -> Path:
+        path_sumo_home = Path(os.environ['SUMO_HOME']) if 'SUMO_HOME' in os.environ else None
+        if path_sumo_home is None:
+            logger.info(f'No definition of SUMO_HOME. Use default path {default_sumo_home}')
+        # end if
+        if 'SUMO_HOME' in os.environ:
+            assert path_sumo_home.joinpath('tools/xml/xml2csv.py').exists()
+            return path_sumo_home.joinpath('tools/xml/xml2csv.py')
+        else:
+            sys.exit("please declare environment variable 'SUMO_HOME'")
+
+    def get_basic_xsd_file(self) -> Path:
+        r = requests.get(urllib.parse.urljoin(statics.BASE_URL_XSD, statics.NAME_BASE_TYPES),
+                         allow_redirects=True)
+        path_basic_xsd = self.path_working_dir.joinpath(statics.NAME_BASE_TYPES)
+        assert r.status_code == 200
+        with path_basic_xsd.open('wb') as f:
+            f.write(r.content)
+        # end with
+        return path_basic_xsd
+
+    def get_xsd_schema_file(self, name_xsd: str) -> Path:
+        r = requests.get(urllib.parse.urljoin(statics.BASE_URL_XSD, name_xsd),
+                         allow_redirects=True)
+        path_xsd = self.path_working_dir.joinpath(name_xsd)
+        assert r.status_code == 200
+        with path_xsd.open('wb') as f:
+            f.write(r.content)
+        # end with
+        return path_xsd
+
+    def get_attributes(self) -> List[str]:
+        assert self.path_tmp_csv is not None, 'run `xml2csv()` first.'
+        df = pandas.read_csv(self.path_tmp_csv, sep=self.separator)
+        __ = [e for e in df.columns.to_list() if e != self.index_header_name and e != self.column_header_name]
+        return __
+
+    def xml2csv(self) -> pandas.DataFrame:
+        path_out = self.path_working_dir.joinpath(self.path_file.name + '.csv')
+        commands = [self.path_python_interpreter.__str__(),
+                    self.path_target_script.__str__(),
+                    '-s', self.separator,
+                    '-x', self.path_xsd.__str__(),
+                    '-o', path_out.__str__(), self.path_file.__str__()]
+        logger.info(f'running command: {commands}')
+        process = subprocess.Popen(commands, stdout=subprocess.PIPE)
+        out = process.communicate()[0]
+        status_code = process.returncode
+        assert status_code == 0, f'Failed to execute the command {" ".join(commands)}'
+        time.sleep(1)
+        assert path_out.exists()
+        self.path_tmp_csv = path_out
+        df = pandas.read_csv(path_out, sep=self.separator)
+        return df
+
+    def _xml2matrix(self, target_element: str, agg_func: Optional[str] = None) -> pandas.DataFrame:
+        assert self.path_tmp_csv is not None, 'run `xml2csv()` first.'
+        df = pandas.read_csv(self.path_tmp_csv, sep=self.separator)
+        check_df = df[[self.index_header_name, self.column_header_name, target_element]]
+        if agg_func is None:
+            assert len(check_df[check_df.duplicated()]) == 0, \
+                f'Detected duplicated {len(check_df[check_df.duplicated()])} rows. Use `agg_func` argument to aggregate values.'
+            matrix_df = df.pivot_table(index=self.index_header_name, columns=self.column_header_name, values=[target_element],
+                                       aggfunc='first')
+        else:
+            matrix_df = df.pivot_table(index=self.index_header_name, columns=self.column_header_name, values=[target_element],
+                                       aggfunc=agg_func)
+        # end
+        return matrix_df
+
+    @staticmethod
+    def index2id(matrix_df: pandas.DataFrame) -> Dict[str, int]:
+        return {f: i for i, f in enumerate(sorted(matrix_df.index.tolist()))}
+
+    @staticmethod
+    def column2id(matrix_df: pandas.DataFrame) -> List[str]:
+        return [f[1] for i, f in enumerate(sorted(matrix_df.columns.tolist()))]
+
+    @staticmethod
+    def _generate_feature_map(matrix_df: pandas.DataFrame) -> Dict[str, int]:
+        values_ndarray = matrix_df.values
+        elements = [e for e in list(set(values_ndarray.flatten())) if isinstance(e, str)]
+        features = {f: i for i, f in enumerate(sorted(elements))}
+        features.update({np.nan: np.nan})
+        return features
+
+    def xml2matrix(self, target_element: str):
+        raise NotImplementedError()
+
+
+
+
+
+
+

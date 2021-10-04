@@ -20,6 +20,7 @@ tabulate = "*"
 pandas = "*"
 tqdm = "^4.61.2"
 more_itertools = "*"
+requests = "*"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.3"
