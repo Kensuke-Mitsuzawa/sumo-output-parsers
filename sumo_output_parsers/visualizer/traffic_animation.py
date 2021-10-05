@@ -4,6 +4,8 @@ from typing import Optional, Tuple
 import tempfile
 import shutil
 import joblib
+import scipy.sparse
+import random
 
 from scipy.sparse import csr_matrix
 import SumoNetVis
@@ -61,14 +63,14 @@ class TrafficAnimationVisualizer(object):
                            path_video_output: Path,
                            intervals: Optional[int] = -1,
                            is_keep_png_dir: bool = False,
-                           frames_auto_adjustment: int = 100,
+                           n_samples: int = 100,
                            n_parallel: int = 4):
         """
         Args:
             path_video_output: A path to save the generated video.
-            intervals: frames to render. if -1, it uses all frames. if None, it used auto-adjustment.
+            intervals: frames to render. if -1, it uses all frames. if None, it uses random sampling.
             is_keep_png_dir: If True, it does not delete png files.
-            frames_auto_adjustment:
+            n_samples:
             n_parallel: A parameter of parallel jobs to generate png files.
 
         Returns:
@@ -80,17 +82,28 @@ class TrafficAnimationVisualizer(object):
         assert length_time_intervals == self.y_position_matrix.matrix.shape[1], \
             f'length of time-intervals does not match. length(x)={self.x_position_matrix.matrix.shape[1]} ' \
             f'length-y={self.y_position_matrix.matrix.shape[1]}'
-        if intervals is None:
-            # auto adjustment
-            intervals = int(length_time_intervals / frames_auto_adjustment)
-            logger.info(f'Auto adjustment of intervals. {intervals}')
-        # end if
 
         x_t = csr_matrix.transpose(self.x_position_matrix.matrix)
         y_t = csr_matrix.transpose(self.y_position_matrix.matrix)
 
-        time_intervals = [(t, str(t_elem)) for t, t_elem in enumerate(self.x_position_matrix.interval_begins)
-                          if t % intervals == 0]
+        x_t_coo = scipy.sparse.coo_matrix(x_t)
+        non_zero_rows = x_t_coo.nonzero()[0]
+        assert len(set(non_zero_rows)) == len(self.x_position_matrix.interval_begins)
+        seq_frame_samples = [(t, str(t_elem))
+                             for t, t_elem in zip(sorted(set(non_zero_rows)), self.x_position_matrix.interval_begins)]
+        if intervals is None:
+            if len(seq_frame_samples) < n_samples:
+                samples = seq_frame_samples
+            else:
+                samples = random.sample(seq_frame_samples, k=n_samples)
+            # end if
+        else:
+            if len(seq_frame_samples) < intervals:
+                samples = seq_frame_samples
+            else:
+                samples = [s for i, s in enumerate(seq_frame_samples) if i % intervals == 0]
+            # end if
+        # end if
 
         def __write_out_png(time_t, t_label, path_sumo_net, path_working_dir):
             sample_x = x_t[time_t].toarray()[0]
@@ -108,7 +121,7 @@ class TrafficAnimationVisualizer(object):
         logger.info(f'Writing out png file with n-parallel={n_parallel}')
         joblib.Parallel(n_jobs=n_parallel)(
             joblib.delayed(__write_out_png)(
-                t[0], t[1], self.path_sumo_net, self.path_working_dir) for t in time_intervals)
+                t[0], t[1], self.path_sumo_net, self.path_working_dir) for t in samples)
         files = [str(p) for p in sorted(self.path_working_dir.glob('*.png'), key=lambda p: int(p.stem))]
         clip = ImageSequenceClip(files, fps=4)
         clip.write_videofile(path_video_output.__str__(), fps=24)
