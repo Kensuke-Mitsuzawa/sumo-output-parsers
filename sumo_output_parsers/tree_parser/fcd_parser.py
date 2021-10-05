@@ -80,7 +80,6 @@ class FCDFileParser(ParserClass):
             # end if
 
             seq_begin.append(elem.attrib['time'])
-            time_interval += 1
             element_time_interval = []
             __car_ids = []
             __values = []
@@ -93,6 +92,7 @@ class FCDFileParser(ParserClass):
             car_ids += list(set(__car_ids))
             values += list(set(__values))
             route_stack += element_time_interval
+            time_interval += 1
         # end for
         del __values
         del __car_ids

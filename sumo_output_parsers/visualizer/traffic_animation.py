@@ -88,9 +88,21 @@ class TrafficAnimationVisualizer(object):
 
         x_t_coo = scipy.sparse.coo_matrix(x_t)
         non_zero_rows = x_t_coo.nonzero()[0]
-        assert len(set(non_zero_rows)) == len(self.x_position_matrix.interval_begins)
-        seq_frame_samples = [(t, str(t_elem))
-                             for t, t_elem in zip(sorted(set(non_zero_rows)), self.x_position_matrix.interval_begins)]
+        # note: usually time-index==0 has an array with all 0 values.
+        assert (len(set(non_zero_rows)) == len(self.x_position_matrix.interval_begins)) or \
+               len(set(non_zero_rows)) + 1 == len(self.x_position_matrix.interval_begins)
+        if len(set(non_zero_rows)) == len(self.x_position_matrix.interval_begins):
+            seq_frame_samples = [(t, str(t_elem))
+                                 for t, t_elem in zip(sorted(set(non_zero_rows)), self.x_position_matrix.interval_begins)]
+        elif len(set(non_zero_rows)) + 1 == len(self.x_position_matrix.interval_begins):
+            seq_frame_samples = [(0, self.x_position_matrix.interval_begins[0])]
+            seq_frame_samples += [(t, str(t_elem))
+                                  for t, t_elem
+                                  in zip(sorted(set(non_zero_rows)), self.x_position_matrix.interval_begins[1:])]
+        else:
+            raise Exception()
+        # end if
+
         if intervals is None:
             if len(seq_frame_samples) < n_samples:
                 samples = seq_frame_samples
