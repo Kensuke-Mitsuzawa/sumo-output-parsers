@@ -1,12 +1,12 @@
 import pickle
 from pathlib import Path
-from sumo_output_parsers.fcd_parser import FCDFileParser, FcdMatrixObject
+from sumo_output_parsers import FCDFileParser, FcdMatrixObject
 from tempfile import mkdtemp
 
 
 def test_fcd_output(resource_path_root: Path):
     parser = FCDFileParser(resource_path_root.joinpath('output/fcd-output.xml'))
-    matrix_obj = parser.xml2matrix('timestep')
+    matrix_obj = parser.xml2matrix('lane', skip_intervals=100)
     path_temp = Path(mkdtemp())
     path_dest = path_temp.joinpath('fcd-matrix.pickle')
 

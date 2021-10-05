@@ -20,7 +20,8 @@ class TrafficAnimationVisualizer(object):
                  path_sumo_net: pathlib.Path,
                  path_fcd_xml: Optional[pathlib.Path] = None,
                  tuple_fcd_matrix: Optional[Tuple[FcdMatrixObject, FcdMatrixObject]] = None,
-                 path_working_dir: Optional[Path] = None):
+                 path_working_dir: Optional[Path] = None,
+                 fcd_skip_iteration: int = -1):
         if path_fcd_xml is None and tuple_fcd_matrix is None:
             raise Exception('Either path_fcd_xml or fcd_matrix must be given.')
         # end if
@@ -28,7 +29,7 @@ class TrafficAnimationVisualizer(object):
         self.net = SumoNetVis.Net(path_sumo_net.__str__())
         self.path_sumo_net = path_sumo_net
         if tuple_fcd_matrix is None and path_fcd_xml is not None:
-            x_position_matrix, y_position_matrix = self.generate_fcd_matrix(path_fcd_xml)
+            x_position_matrix, y_position_matrix = self.generate_fcd_matrix(path_fcd_xml, fcd_skip_iteration)
         elif tuple_fcd_matrix is not None:
             __attrs = (tuple_fcd_matrix[0].value_type, tuple_fcd_matrix[1].value_type)
             assert __attrs == ('x', 'y'), \
@@ -48,27 +49,38 @@ class TrafficAnimationVisualizer(object):
         # end if
 
     @staticmethod
-    def generate_fcd_matrix(path_fcd_output: Path) -> Tuple[FcdMatrixObject, FcdMatrixObject]:
+    def generate_fcd_matrix(path_fcd_output: Path, fcd_skip_iteration: int) -> Tuple[FcdMatrixObject, FcdMatrixObject]:
         logger.info('Parsing fcd output...')
         parser = FCDFileParser(path_fcd_output)
-        x_position_matrix = parser.xml2matrix('x')
-        y_position_matrix = parser.xml2matrix('y')
+        x_position_matrix = parser.xml2matrix('x', skip_intervals=fcd_skip_iteration)
+        y_position_matrix = parser.xml2matrix('y', skip_intervals=fcd_skip_iteration)
         logger.info('done fcd output')
         return x_position_matrix, y_position_matrix
 
     def generate_animation(self,
                            path_video_output: Path,
-                           intervals: int = -1,
+                           intervals: Optional[int] = -1,
                            is_keep_png_dir: bool = False,
                            frames_auto_adjustment: int = 100,
                            n_parallel: int = 4):
+        """
+        Args:
+            path_video_output: A path to save the generated video.
+            intervals: frames to render. if -1, it uses all frames. if None, it used auto-adjustment.
+            is_keep_png_dir: If True, it does not delete png files.
+            frames_auto_adjustment:
+            n_parallel: A parameter of parallel jobs to generate png files.
+
+        Returns:
+
+        """
         assert path_video_output.parent.exists()
 
         length_time_intervals = self.x_position_matrix.matrix.shape[1]
         assert length_time_intervals == self.y_position_matrix.matrix.shape[1], \
             f'length of time-intervals does not match. length(x)={self.x_position_matrix.matrix.shape[1]} ' \
             f'length-y={self.y_position_matrix.matrix.shape[1]}'
-        if intervals == -1:
+        if intervals is None:
             # auto adjustment
             intervals = int(length_time_intervals / frames_auto_adjustment)
             logger.info(f'Auto adjustment of intervals. {intervals}')

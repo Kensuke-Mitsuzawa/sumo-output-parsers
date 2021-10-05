@@ -1,6 +1,6 @@
 import pickle
 from pathlib import Path
-from sumo_output_parsers.loop_detector_parser import LoopDetectorParser, LoopDetectorMatrixObject
+from sumo_output_parsers import LoopDetectorParser, LoopDetectorMatrixObject
 from tempfile import mkdtemp
 
 

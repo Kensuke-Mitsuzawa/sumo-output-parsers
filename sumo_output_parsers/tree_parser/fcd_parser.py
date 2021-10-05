@@ -52,10 +52,13 @@ class FCDFileParser(ParserClass):
         # end for
         return list(set(metrics))
 
-    def xml2matrix(self, target_element: str) -> FcdMatrixObject:
+    def xml2matrix(self, target_element: str, skip_intervals: int = -1) -> FcdMatrixObject:
         """generates matrix object with the specified key name.
-        :param target_element: a name of key which corresponds to values of the matrix.
-        :return: MatrixObject
+        Args:
+            target_element: a name of key which corresponds to values of the matrix.
+            skip_intervals: parameter of sub-sampling. -1 is disable.
+        Return:
+            FcdMatrixObject
         """
         route_stack = []
         car_ids = []
@@ -66,7 +69,16 @@ class FCDFileParser(ParserClass):
         logger.info('Parsing FCD xml...')
         __car_ids = []
         __values = []
+        if skip_intervals != -1:
+            logger.info(f'`skip_intervals` = {skip_intervals} is available. The method sub-samples.')
+        # end if
         for elem in tqdm(self.getelements(str(self.path_file), tag=self.name_time_node)):
+            if skip_intervals != -1:
+                if time_interval % skip_intervals != 0:
+                    time_interval += 1
+                    continue
+            # end if
+
             seq_begin.append(elem.attrib['time'])
             time_interval += 1
             element_time_interval = []
