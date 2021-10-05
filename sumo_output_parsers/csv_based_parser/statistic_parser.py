@@ -1,10 +1,9 @@
 import dataclasses
 from typing import Optional, Dict, List
 
-import scipy.sparse
-from scipy.sparse import csr_matrix
-from pathlib import Path
 import numpy as np
+import pandas
+from pathlib import Path
 
 from sumo_output_parsers.models.parser import CsvBasedParser
 
@@ -22,6 +21,19 @@ class StatisticFileParser(CsvBasedParser):
                                                   path_working_dir=path_working_dir,
                                                   index_header_name=matrix_index,
                                                   column_header_name=matrix_column)
+
+    @staticmethod
+    def clean_up_dataframe(df_statistics: pandas.DataFrame) -> pandas.DataFrame:
+        return_records = []
+        for c_name in df_statistics.columns:
+            non_nan_cell = df_statistics[c_name].dropna()
+            if len(non_nan_cell) == 0:
+                return_records.append({'metric': c_name, 'value': np.NaN})
+            else:
+                return_records.append({'metric': c_name, 'value': non_nan_cell.item()})
+        # end if
+        _df = pandas.DataFrame(return_records)
+        return _df
 
     def xml2matrix(self, target_element: str, agg_func = None):
         raise NotImplementedError('`xml2matrix() is not available for summary output.`')
