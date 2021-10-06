@@ -104,7 +104,7 @@ class ParserClass(object):
         data = np.array(__data)
         del __row, __col, __data
         assert len(col) == len(data) == len(row)
-        logger.info(f'row-size={row.max()} column-size={col.max()}')
+        logger.info(f'row-size={len(set(row))} column-size={len(set(col))}')
         # matrix-size
         matrix_size = (row.max() + 1, time_interval + 1)
         target_matrix = csr_matrix((data, (row, col)), shape=matrix_size)

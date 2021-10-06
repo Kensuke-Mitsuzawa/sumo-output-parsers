@@ -21,6 +21,7 @@ class FcdMatrixObject(MatrixObject):
     interval_begins: np.ndarray
     value_type: str
     interval_end: Optional[np.ndarray] = None
+    sub_sampling_interval: Optional[int] = None
 
     @classmethod
     def from_pickle(self, path_pickle: Path) -> "FcdMatrixObject":
@@ -129,4 +130,6 @@ class FCDFileParser(ParserClass):
             value2id=values2id,
             car2id=car2id,
             interval_begins=begin_time_vector,
-            value_type=target_element)
+            value_type=target_element,
+            sub_sampling_interval=skip_intervals
+        )

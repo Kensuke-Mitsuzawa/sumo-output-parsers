@@ -1,4 +1,5 @@
 import dataclasses
+import itertools
 from pathlib import Path
 from typing import Optional, List
 import pickle
@@ -65,9 +66,12 @@ class LoopDetectorParser(ParserClass):
         time_interval_begin = []
         time_interval_end = []
         time_interval = 0
+        current_time_label = ''
         logger.info('Parsing loop xml...')
-        for elem in tqdm(self.getelements(str(self.path_file), tag=self.name_interval_node)):
-            time_interval += 1
+        for i, elem in enumerate(self.getelements(str(self.path_file), tag=self.name_interval_node)):
+            if i == 0:
+                current_time_label = elem.get('begin')
+            # end if
             detector_id: str = elem.get('id')
             time_begin: str = elem.get('begin')
             time_end: str = elem.get('end')
@@ -89,12 +93,16 @@ class LoopDetectorParser(ParserClass):
             time_interval_end.append(time_end)
             detector_ids.append(detector_id)
             stacks.append((time_begin, detector_id, target_value))
+            if current_time_label != time_begin:
+                time_interval += 1
+                current_time_label = time_begin
+            # end if
         # end for
 
         time2id = self.generate_time2id(time_interval_begin) \
             if self.detect_data_type_time(time_interval_begin) else None
         det_ids = list(sorted(list(set(detector_ids))))
-        logger.info(f'Parsing done. n-time-interval={time_interval} detector-ids={len(det_ids)}')
+        logger.info(f'Parsing done. n-time-interval = {time_interval + 1} detector-ids={len(det_ids)}')
         detector2id = {car_id: i for i, car_id in enumerate(det_ids)}
         metric_matrix = self.generate_csr_matrix(
             data_stack=stacks,
