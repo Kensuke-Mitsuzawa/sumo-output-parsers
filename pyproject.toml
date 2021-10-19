@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "sumo_output_parsers"
-version = "0.32"
+version = "0.4"
 description = "Fast and lightweight file parsers for SUMO(traffic simulator) output"
 authors = ["Kensuke Mitsuzawa <kensuke.mit@gmail.com>"]
 maintainers = ["Kensuke Mitsuzawa <kensuke.mit@gmail.com>"]
@@ -22,8 +22,11 @@ tqdm = "^4.61.2"
 more_itertools = "*"
 requests = "*"
 SumoNetVis = "*"
-moviepy = "*"
+moviepy = "<1.0.2"
 joblib = "*"
+hvplot = "*"
+geopandas = "*"
+geoviews = "*"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.3"

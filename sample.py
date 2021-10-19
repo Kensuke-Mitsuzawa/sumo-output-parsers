@@ -42,4 +42,4 @@ df_statistic = StatisticFileParser(path_statistic_output).xml2csv()
 # generating animation
 path_video = path_output.joinpath('video.mp4')
 traffic_animation = TrafficAnimationVisualizer(path_sumo_net=path_net, path_fcd_xml=path_fcd_output)
-traffic_animation.generate_animation(path_video_output=path_video, frames_auto_adjustment=20, n_parallel=4)
+traffic_animation.generate_animation(path_video_output=path_video, n_parallel=4)
