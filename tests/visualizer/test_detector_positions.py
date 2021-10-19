@@ -21,4 +21,3 @@ def test_detector_positions(resource_path_root: Path):
 
 if __name__ == '__main__':
     test_detector_positions(Path('../resources/').absolute())
-
