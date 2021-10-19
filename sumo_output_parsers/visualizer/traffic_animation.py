@@ -23,7 +23,16 @@ class TrafficAnimationVisualizer(object):
                  path_fcd_xml: Optional[pathlib.Path] = None,
                  tuple_fcd_matrix: Optional[Tuple[FcdMatrixObject, FcdMatrixObject]] = None,
                  path_working_dir: Optional[Path] = None,
-                 fcd_skip_iteration: int = -1):
+                 skip_intervals: int = -1):
+        """
+
+        Args:
+            path_sumo_net: path to net.xml file
+            path_fcd_xml: path to fcd output file
+            tuple_fcd_matrix: (fcd matrix of car x-positions, fcd matrix of car y-positions)
+            path_working_dir: path to working directory
+            skip_intervals: for approximation.
+        """
         if path_fcd_xml is None and tuple_fcd_matrix is None:
             raise Exception('Either path_fcd_xml or fcd_matrix must be given.')
         # end if
@@ -31,7 +40,7 @@ class TrafficAnimationVisualizer(object):
         self.net = SumoNetVis.Net(path_sumo_net.__str__())
         self.path_sumo_net = path_sumo_net
         if tuple_fcd_matrix is None and path_fcd_xml is not None:
-            x_position_matrix, y_position_matrix = self.generate_fcd_matrix(path_fcd_xml, fcd_skip_iteration)
+            x_position_matrix, y_position_matrix = self.generate_fcd_matrix(path_fcd_xml, skip_intervals)
         elif tuple_fcd_matrix is not None:
             __attrs = (tuple_fcd_matrix[0].value_type, tuple_fcd_matrix[1].value_type)
             assert __attrs == ('x', 'y'), \
@@ -51,11 +60,11 @@ class TrafficAnimationVisualizer(object):
         # end if
 
     @staticmethod
-    def generate_fcd_matrix(path_fcd_output: Path, fcd_skip_iteration: int) -> Tuple[FcdMatrixObject, FcdMatrixObject]:
+    def generate_fcd_matrix(path_fcd_output: Path, skip_intervals: int) -> Tuple[FcdMatrixObject, FcdMatrixObject]:
         logger.info('Parsing fcd output...')
         parser = FCDFileParser(path_fcd_output)
-        x_position_matrix = parser.xml2matrix('x', skip_intervals=fcd_skip_iteration)
-        y_position_matrix = parser.xml2matrix('y', skip_intervals=fcd_skip_iteration)
+        x_position_matrix = parser.xml2matrix('x', skip_intervals=skip_intervals)
+        y_position_matrix = parser.xml2matrix('y', skip_intervals=skip_intervals)
         logger.info('done fcd output')
         return x_position_matrix, y_position_matrix
 
@@ -70,7 +79,7 @@ class TrafficAnimationVisualizer(object):
             path_video_output: A path to save the generated video.
             intervals: frames to render. if -1, it uses all frames. if None, it uses random sampling.
             is_keep_png_dir: If True, it does not delete png files.
-            n_samples:
+            n_samples: the number of samples to use for the animation.
             n_parallel: A parameter of parallel jobs to generate png files.
 
         Returns:
