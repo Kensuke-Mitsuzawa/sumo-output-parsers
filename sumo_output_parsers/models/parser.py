@@ -1,3 +1,6 @@
+import pathlib
+import shutil
+import typing
 import urllib.parse
 from pathlib import Path
 from typing import Optional, List, Union, Dict, Tuple
@@ -10,6 +13,9 @@ import sys
 import subprocess
 import time
 import pandas
+import base64
+import json
+import hashlib
 
 import numpy as np
 import requests
@@ -22,13 +28,45 @@ from sumo_output_parsers.models import statics
 class ParserClass(object):
     def __init__(
             self,
-            path_file: Path):
+            path_file: Path,
+            path_cache: Path = statics.PATH_CACHING_DIR,
+            is_caching: bool = True):
         """A handler class that parse output-files of Sumo's output.
         Args:
-            path_file: pathlib.Path object that leads into output file path
+            path_file: pathlib.Path object that leads into output file path.
+            path_cache: pathlib.Path
+            is_caching: True if a parser holds processed files, False not.
         """
         assert path_file.exists(), f'No input file named {path_file}'
         self.path_file = path_file
+        self.path_cache = path_cache
+        self.is_caching = is_caching
+        self.generate_caching_directory()
+        self.cache_param_max_length = 100
+
+    def generate_caching_directory(self):
+        if self.is_caching and not pathlib.Path(self.path_cache).exists():
+            pathlib.Path(self.path_cache).mkdir()
+
+    def check_cache_file(self, path_cache: pathlib.Path) -> bool:
+        """check an existing file in the cache directory and return the path.
+
+        Returns: True or False.
+        """
+        if path_cache.exists():
+            return True
+        else:
+            return False
+
+    def generate_cache_path(self, method_name: str, suffix: str) -> pathlib.Path:
+        return self.path_cache.joinpath(f'{self.__class__.__name__}-{method_name}-{suffix}')
+
+    def encode_parameters(self, **kwargs) -> str:
+        """generate base64 encoded string"""
+        message_bytes = json.dumps(kwargs).encode('utf-8')
+        base64_bytes = base64.b64encode(message_bytes)
+        hash_key = hashlib.md5(base64_bytes).hexdigest()
+        return hash_key
 
     @staticmethod
     def generate_time2id(time_intervals_begin: List[str]) -> Dict[str, int]:
@@ -158,16 +196,20 @@ class ParserClass(object):
 
 
 class CsvBasedParser(ParserClass):
+    """A base class that utilises SUMO-default csv script. SUMO is supposed to be installed in your environment."""
     def __init__(self,
                  path_xml_file: Path,
                  name_xsd: str,
                  index_header_name: str,
                  column_header_name: str,
-                 path_working_dir: Optional[Path],
-                 path_default_sumo_home: Path = statics.PATH_DEFAULT_SUMO_HOME):
-        super(CsvBasedParser, self).__init__(path_file=path_xml_file)
+                 path_working_dir: Optional[Path] = statics.PATH_CACHING_DIR,
+                 path_default_sumo_home: Path = statics.PATH_DEFAULT_SUMO_HOME,
+                 is_caching: bool = True):
+        super(CsvBasedParser, self).__init__(path_file=path_xml_file,
+                                             path_cache=path_working_dir,
+                                             is_caching=is_caching)
         self.name_xsd = name_xsd
-        if path_working_dir is None:
+        if path_working_dir is None or path_working_dir == statics.PATH_CACHING_DIR:
             self.path_working_dir = Path(mkdtemp())
             self.path_basic_xsd = self.get_basic_xsd_file()
             self.path_xsd = self.get_xsd_schema_file(name_xsd)
@@ -224,6 +266,17 @@ class CsvBasedParser(ParserClass):
         return __
 
     def xml2csv(self) -> pandas.DataFrame:
+        # region checking caching of an encoded csv file.
+        encoded_params = self.encode_parameters(
+            separator=self.separator,
+            path_xml=self.path_file.__str__())
+        p_cache = self.generate_cache_path(method_name='xml2csv', suffix=encoded_params)
+        if self.is_caching and p_cache.exists():
+            logger.info(f'using cache {p_cache}')
+            self.path_tmp_csv = p_cache
+            return pandas.read_csv(p_cache, sep=self.separator)
+        # endif
+
         path_out = self.path_working_dir.joinpath(self.path_file.name + '.csv')
         commands = [self.path_python_interpreter.__str__(),
                     self.path_target_script.__str__(),
@@ -233,6 +286,7 @@ class CsvBasedParser(ParserClass):
         logger.info(f'running command: {commands}')
         process = subprocess.Popen(commands, stdout=subprocess.PIPE)
         out = process.communicate()[0]
+        shutil.copy(path_out.__str__(), p_cache)
         status_code = process.returncode
         assert status_code == 0, f'Failed to execute the command {" ".join(commands)}'
         time.sleep(1)
@@ -254,6 +308,7 @@ class CsvBasedParser(ParserClass):
             matrix_df = df.pivot_table(index=self.index_header_name, columns=self.column_header_name, values=[target_element],
                                        aggfunc=agg_func)
         # end
+
         return matrix_df
 
     @staticmethod

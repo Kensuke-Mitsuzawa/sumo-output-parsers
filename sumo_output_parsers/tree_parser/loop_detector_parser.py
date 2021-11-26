@@ -58,9 +58,20 @@ class LoopDetectorParser(ParserClass):
 
     def xml2matrix(self, target_element: str) -> LoopDetectorMatrixObject:
         """generates matrix object with the specified key name.
-        :param target_element: a name of key which corresponds to values of the matrix.
-        :return: MatrixObject
+        Args:
+            target_element: a name of key which corresponds to values of the matrix.
+        Returns:
+             MatrixObject
         """
+        # region caching check
+        p_cache = self.generate_cache_path(method_name='xml2matrix', suffix=self.encode_parameters(
+            path_file=str(self.path_file),
+            target_element=target_element))
+        if self.is_caching and self.check_cache_file(p_cache):
+            logger.info(f'using caching {p_cache}')
+            return LoopDetectorMatrixObject.from_pickle(p_cache)
+        # endregion
+
         stacks = []
         detector_ids = []
         time_interval_begin = []
@@ -116,12 +127,14 @@ class LoopDetectorParser(ParserClass):
         end_time_vector = numpy.array(time_interval_end)
         assert len(metric_matrix.shape) == 2, f'The method expects 2nd array. But it detects {metric_matrix.shape} object. ' \
                                               f'Check your xml file at {self.path_file}'
-        return LoopDetectorMatrixObject(
+        m_obj = LoopDetectorMatrixObject(
             matrix=metric_matrix,
             detectors=detectors,
             interval_begins=begin_time_vector,
             interval_end=end_time_vector,
             value_type=target_element)
+        m_obj.to_pickle(p_cache)
+        return m_obj
 
     def to_array_objects(self, aggregation_on: str) -> MatrixObject:
         matrix_obj = self.xml2matrix(target_element=aggregation_on)

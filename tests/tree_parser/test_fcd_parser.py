@@ -13,6 +13,12 @@ def test_fcd_output(resource_path_root: Path):
     matrix_obj.to_pickle(path_dest)
     matrix_obj_file = FcdMatrixObject.from_pickle(path_dest)
 
+    p_cache = parser.generate_cache_path(method_name='xml2matrix', suffix=parser.encode_parameters(
+        path_file=str(parser.path_file),
+        target_element='lane',
+        skip_intervals=100))
+    assert p_cache.exists()
+
 
 if __name__ == '__main__':
     test_fcd_output(Path('resources/'))

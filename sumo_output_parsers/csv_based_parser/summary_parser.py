@@ -7,13 +7,13 @@ from pathlib import Path
 import numpy as np
 
 from sumo_output_parsers.models.parser import CsvBasedParser, MatrixObject
-
+from sumo_output_parsers.models.statics import PATH_CACHING_DIR
 
 class SummaryFileParser(CsvBasedParser):
     def __init__(self,
                  path_xml_file: Path,
                  name_xsd: str = 'summary_file.xsd',
-                 path_working_dir: Optional[Path] = None,
+                 path_working_dir: Optional[Path] = PATH_CACHING_DIR,
                  matrix_index: str = '',
                  matrix_column: str = ''
                  ):
