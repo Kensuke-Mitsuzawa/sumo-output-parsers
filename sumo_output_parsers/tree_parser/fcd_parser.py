@@ -61,6 +61,16 @@ class FCDFileParser(ParserClass):
         Return:
             FcdMatrixObject
         """
+        # region caching check
+        p_cache = self.generate_cache_path(method_name='xml2matrix', suffix=self.encode_parameters(
+            path_file=str(self.path_file),
+            target_element=target_element,
+            skip_intervals=skip_intervals))
+        if self.is_caching and self.check_cache_file(p_cache):
+            logger.info(f'using caching {p_cache}')
+            return FcdMatrixObject.from_pickle(p_cache)
+        # endregion
+
         route_stack = []
         car_ids = []
         values = []
@@ -125,7 +135,7 @@ class FCDFileParser(ParserClass):
         begin_time_vector = np.array(seq_begin)
         assert len(lane_matrix.shape) == 2, f'The method expects 2nd array. But it detects {lane_matrix.shape} object. ' \
                                             f'Check your xml file at {self.path_file}'
-        return FcdMatrixObject(
+        m_obj = FcdMatrixObject(
             matrix=lane_matrix,
             value2id=values2id,
             car2id=car2id,
@@ -133,3 +143,7 @@ class FCDFileParser(ParserClass):
             value_type=target_element,
             sub_sampling_interval=skip_intervals
         )
+        if self.is_caching:
+            m_obj.to_pickle(p_cache)
+        # endif
+        return m_obj

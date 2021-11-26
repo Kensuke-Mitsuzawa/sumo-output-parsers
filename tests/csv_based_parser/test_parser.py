@@ -20,6 +20,7 @@ def test_csv_based_parser(resource_path_root: Path):
     for test_args in test_metrics:
         parser = test_args[0](resource_path_root.joinpath(f'output/{test_args.input_file}'))
         parser.xml2csv()
+        parser.xml2csv()
         if isinstance(parser, StatisticFileParser):
             parser.clean_up_dataframe(parser.xml2csv())
 
