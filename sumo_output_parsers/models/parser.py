@@ -273,6 +273,7 @@ class CsvBasedParser(ParserClass):
         p_cache = self.generate_cache_path(method_name='xml2csv', suffix=encoded_params)
         if self.is_caching and p_cache.exists():
             logger.info(f'using cache {p_cache}')
+            self.path_tmp_csv = p_cache
             return pandas.read_csv(p_cache, sep=self.separator)
         # endif
 
