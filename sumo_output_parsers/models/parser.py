@@ -15,6 +15,7 @@ import time
 import pandas
 import base64
 import json
+import hashlib
 
 import numpy as np
 import requests
@@ -41,6 +42,7 @@ class ParserClass(object):
         self.path_cache = path_cache
         self.is_caching = is_caching
         self.generate_caching_directory()
+        self.cache_param_max_length = 100
 
     def generate_caching_directory(self):
         if self.is_caching and not pathlib.Path(self.path_cache).exists():
@@ -59,12 +61,12 @@ class ParserClass(object):
     def generate_cache_path(self, method_name: str, suffix: str) -> pathlib.Path:
         return self.path_cache.joinpath(f'{self.__class__.__name__}-{method_name}-{suffix}')
 
-    @staticmethod
-    def encode_parameters(**kwargs) -> str:
+    def encode_parameters(self, **kwargs) -> str:
         """generate base64 encoded string"""
         message_bytes = json.dumps(kwargs).encode('utf-8')
         base64_bytes = base64.b64encode(message_bytes)
-        return str(base64_bytes)
+        hash_key = hashlib.md5(base64_bytes).hexdigest()
+        return hash_key
 
     @staticmethod
     def generate_time2id(time_intervals_begin: List[str]) -> Dict[str, int]:

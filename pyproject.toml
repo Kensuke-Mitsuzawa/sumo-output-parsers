@@ -33,6 +33,7 @@ pytest = "^6.2.3"
 pytest-resource-path = "^1.3.0"
 nbmake = "0.5"
 pytest-parallel = "*"
+sphinx = "*"
 
 [tool.poetry.scripts]
 
