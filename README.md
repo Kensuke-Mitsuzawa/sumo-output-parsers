@@ -17,6 +17,21 @@ This package provides an easy-to-call python interface to obtain matrix form fro
 
 ![Example of animation](https://user-images.githubusercontent.com/1772712/135924848-4a938dd2-b2d3-4dfe-bfd6-94904086c382.gif)
 
+# Install
+
+```
+pip install sumo-output-parsers
+```
+
+Some submodules are not ready to use by default for which
+we avoid errors relating Proproj or Cartopy. 
+
+If you'd like to depict car flows or detector positions, install with
+
+```
+pip install "sumo-output-parsers[full]"
+```
+
 # Sample
 
 See `sample.py`
@@ -26,6 +41,10 @@ See `sample.py`
 ```
 pytest tests
 ```
+
+# For developers
+
+Build with poetry.
 
 # License
 
