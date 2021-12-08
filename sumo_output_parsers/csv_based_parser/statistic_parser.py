@@ -16,13 +16,14 @@ class StatisticFileParser(CsvBasedParser):
                  name_xsd: str = 'statistic_file.xsd',
                  path_working_dir: Optional[Path] = PATH_CACHING_DIR,
                  matrix_index: str = '',
-                 matrix_column: str = ''
-                 ):
+                 matrix_column: str = '',
+                 is_caching: bool = True):
         super(StatisticFileParser, self).__init__(path_xml_file=path_xml_file,
                                                   name_xsd=name_xsd,
                                                   path_working_dir=path_working_dir,
                                                   index_header_name=matrix_index,
-                                                  column_header_name=matrix_column)
+                                                  column_header_name=matrix_column,
+                                                  is_caching=is_caching)
 
     @staticmethod
     def clean_up_dataframe(df_statistics: pandas.DataFrame) -> pandas.DataFrame:

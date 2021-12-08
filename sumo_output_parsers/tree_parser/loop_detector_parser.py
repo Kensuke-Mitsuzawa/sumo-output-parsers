@@ -33,8 +33,8 @@ class LoopDetectorParser(ParserClass):
     Args:
         path_file: pathlib.Path object that leads into output file's path.
     """
-    def __init__(self, path_file: Path):
-        super(LoopDetectorParser, self).__init__(path_file)
+    def __init__(self, path_file: Path, is_caching: bool = True):
+        super(LoopDetectorParser, self).__init__(path_file, is_caching=is_caching)
         self.name_interval_node = 'interval'
         self.pre_defined_attribute = ['begin', 'end', 'id']
 
@@ -133,7 +133,8 @@ class LoopDetectorParser(ParserClass):
             interval_begins=begin_time_vector,
             interval_end=end_time_vector,
             value_type=target_element)
-        m_obj.to_pickle(p_cache)
+        if self.is_caching:
+            m_obj.to_pickle(p_cache)
         return m_obj
 
     def to_array_objects(self, aggregation_on: str) -> MatrixObject:

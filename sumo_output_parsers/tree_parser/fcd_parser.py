@@ -31,12 +31,13 @@ class FcdMatrixObject(MatrixObject):
 
 
 class FCDFileParser(ParserClass):
-    def __init__(self, path_file: Path):
+    def __init__(self, path_file: Path, is_caching: bool = True):
         """A handler class that parse output-files of Sumo's output.
         Args:
             path_file: pathlib.Path object that leads into output file's path.
+            is_caching
         """
-        super().__init__(path_file)
+        super().__init__(path_file, is_caching=is_caching)
         self.name_vehicle_node = 'vehicle'
         self.name_time_node = 'timestep'
         self.pre_defined_attribute = ['id']

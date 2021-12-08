@@ -1,9 +1,7 @@
-import pickle
 from pathlib import Path
 from sumo_output_parsers.visualizer.traffic_animation import TrafficAnimationVisualizer
 
 from tempfile import mkdtemp
-from sumo_output_parsers.logger_unit import logger
 
 
 def test_traffic_animation(resource_path_root: Path):
