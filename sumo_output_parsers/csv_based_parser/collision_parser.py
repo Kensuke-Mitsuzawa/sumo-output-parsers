@@ -24,13 +24,15 @@ class CollisionFileParser(CsvBasedParser):
                  name_xsd: str = 'collision_file.xsd',
                  path_working_dir: Optional[Path] = PATH_CACHING_DIR,
                  matrix_index: str = 'collision_lane',
-                 matrix_column: str = 'collision_time'
+                 matrix_column: str = 'collision_time',
+                 is_caching: bool = True
                  ):
         super(CollisionFileParser, self).__init__(path_xml_file=path_xml_file,
                                                   name_xsd=name_xsd,
                                                   path_working_dir=path_working_dir,
                                                   index_header_name=matrix_index,
-                                                  column_header_name=matrix_column)
+                                                  column_header_name=matrix_column,
+                                                  is_caching=is_caching)
 
     def xml2matrix(self, target_element: str, agg_func = None) -> CollisionMatrixObject:
         matrix_df = self._xml2matrix(target_element, agg_func=agg_func)

@@ -286,7 +286,9 @@ class CsvBasedParser(ParserClass):
         logger.info(f'running command: {commands}')
         process = subprocess.Popen(commands, stdout=subprocess.PIPE)
         out = process.communicate()[0]
-        shutil.copy(path_out.__str__(), p_cache)
+        if self.is_caching:
+            shutil.copy(path_out.__str__(), p_cache)
+        # end if
         status_code = process.returncode
         assert status_code == 0, f'Failed to execute the command {" ".join(commands)}'
         time.sleep(1)
