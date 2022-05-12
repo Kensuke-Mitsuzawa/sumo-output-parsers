@@ -39,12 +39,23 @@ See `sample.py`
 # Test
 
 ```
-pytest tests
+pytest tests/
 ```
+
+If your package-dependency is complete including packages for visualization, 
+then `pytest tests/ --visualization`
+
 
 # For developers
 
 Build with poetry.
+
+# Install Guide
+
+When you encounter any dependency issues, I recommend to use `conda`.
+`cartopy` and `proj` cause the dependency issue frequently.
+Conda helps you to install the compiled binaries.
+See Proj [documentation](https://proj.org/install.html).
 
 # License
 

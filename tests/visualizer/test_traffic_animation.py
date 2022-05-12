@@ -1,9 +1,11 @@
+import pytest
 from pathlib import Path
 from sumo_output_parsers.visualizer.traffic_animation import TrafficAnimationVisualizer
 
 from tempfile import mkdtemp
 
 
+@pytest.mark.visualization
 def test_traffic_animation(resource_path_root: Path):
     visualizer = TrafficAnimationVisualizer(
         path_sumo_net=resource_path_root.joinpath('grid.net.xml'),
