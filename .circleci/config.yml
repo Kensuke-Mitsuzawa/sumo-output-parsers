@@ -1,26 +1,20 @@
 version: 2.1
-
+workflows:
+  tests:
+    jobs:
+      - pypi-3.8
+      - pypi-3.9
+      - install-3.8
+      - install-3.9
 orbs:
   python: circleci/python@1.2
 
 jobs:
-  pypi-install:
-    machine: true
+  pypi-3.8: &pypi-template
+    docker:
+      - image: circleci/python:3.8
     steps:
       - checkout
-      - run:
-          name: Installing OpenSSL
-          command: sudo apt update && sudo apt install OpenSSL
-      - run:
-          name: Updating Pyenv
-          command: cd /opt/circleci/.pyenv/plugins/python-build/../.. && git pull && cd -
-      - run:
-          name: Install Python
-          command: pyenv install 3.9
-      - run:
-          name: Set Python Version
-          #
-          command: pyenv global 3.9
       - run:
           name: pypi
           command: pip install sumo-output-parsers
@@ -30,32 +24,23 @@ jobs:
       - run:
           name: Run tests
           command: pytest tests
-  package-build:
-    machine: true
+  install-3.8: &install-template
+    docker:
+      - image: circleci/python:3.8
     steps:
       - checkout
-      - run:
-          name: Installing OpenSSL
-          command: sudo apt update && sudo apt install OpenSSL
-      - run:
-          name: Updating Pyenv
-          command: cd /opt/circleci/.pyenv/plugins/python-build/../.. && git pull && cd -
-      - run:
-          name: Install Python
-          command: pyenv install 3.9
-      - run:
-          name: Set Python Version
-          #
-          command: pyenv global 3.9
       - run:
           name: install package dependencies
           command: pip install poetry && make install && pip install pytest pytest-resource-path
       - run:
           name: Run tests
           command: make test
+  pypi-3.9:
+    <<: *pypi-template
+    docker:
+      - image: circleci/python:3.9
+  install-3.9:
+    <<: *install-template
+    docker:
+      - image: circleci/python:3.9
 
-workflows:
-  tests:
-    jobs:
-      - package-build
-      - pypi-install
