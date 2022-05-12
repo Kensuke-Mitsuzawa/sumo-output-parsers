@@ -1,18 +1,28 @@
 version: 2.1
 workflows:
+  version: 2
   tests:
     jobs:
-      - pypi-3.8
-      - pypi-3.9
-      - install-3.8
-      - install-3.9
-orbs:
-  python: circleci/python@1.2
-
+      - pypiTest:
+          name: "3.9"
+          v: "3.9"
+      - pypiTest:
+          name: "3,8"
+          v: "3.8"
+      - installTest:
+          name: "3.9"
+          v: "3.9"
 jobs:
-  pypi-3.8: &pypi-template
+  pypiTest:
+    parameters:
+      v:
+        type: string
+        default: "latest"
+      latest:
+        type: boolean
+        default: false
     docker:
-      - image: circleci/python:3.8
+      - image: "circleci/python:<< parameters.v >>"
     steps:
       - checkout
       - run:
@@ -24,9 +34,16 @@ jobs:
       - run:
           name: Run tests
           command: pytest tests
-  install-3.8: &install-template
+  installTest:
+    parameters:
+      v:
+        type: string
+        default: "latest"
+      latest:
+        type: boolean
+        default: false
     docker:
-      - image: circleci/python:3.8
+      - image: "circleci/python:<< parameters.v >>"
     steps:
       - checkout
       - run:
@@ -35,12 +52,3 @@ jobs:
       - run:
           name: Run tests
           command: make test
-  pypi-3.9:
-    <<: *pypi-template
-    docker:
-      - image: circleci/python:3.9
-  install-3.9:
-    <<: *install-template
-    docker:
-      - image: circleci/python:3.9
-
