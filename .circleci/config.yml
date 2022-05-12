@@ -48,7 +48,10 @@ jobs:
       - checkout
       - run:
           name: install package dependencies
-          command: pip install poetry && make install && pip install pytest pytest-resource-path
+          command: pip install poetry && pip install pytest pytest-resource-path
+      - run:
+          name: install the package
+          command: poetry install
       - run:
           name: Run tests
-          command: make test
+          command: pytest tests/

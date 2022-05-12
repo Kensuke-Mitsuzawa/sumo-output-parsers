@@ -1,12 +1,11 @@
 import pytest
 from pathlib import Path
-from sumo_output_parsers.visualizer.detector_positions import DetectorPositionVisualizer
-
 from tempfile import mkdtemp
 
 
 @pytest.mark.visualization
 def test_detector_positions(resource_path_root: Path):
+    from sumo_output_parsers.visualizer.detector_positions import DetectorPositionVisualizer
     assert resource_path_root.exists()
     visualizer = DetectorPositionVisualizer(
         path_sumo_net=resource_path_root.joinpath('grid.net.xml'),
