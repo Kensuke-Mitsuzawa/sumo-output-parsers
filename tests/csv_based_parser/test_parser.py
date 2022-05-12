@@ -1,4 +1,5 @@
 import pickle
+import pytest
 from pathlib import Path
 from sumo_output_parsers.csv_based_parser.collision_parser import CollisionFileParser
 from sumo_output_parsers.csv_based_parser.summary_parser import SummaryFileParser
@@ -11,6 +12,7 @@ from collections import namedtuple
 TestSetting = namedtuple('TestSetting', ('parser_class', 'input_file', 'is_matrix_method', 'metrics'))
 
 
+@pytest.mark.sumo
 def test_csv_based_parser(resource_path_root: Path):
     test_metrics = [
         TestSetting(StatisticFileParser, 'statistic-output.xml', False, []),
