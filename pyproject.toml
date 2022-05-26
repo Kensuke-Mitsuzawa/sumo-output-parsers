@@ -33,6 +33,7 @@ geopandas = { version = "^0.10.0", optional = true }
 geoviews = { version = "^1.9.1", optional = true }
 imageio-ffmpeg = { version = "*", optional = true }
 pyviz = { version = "*", optional = true }
+adjustText = { version = "*", optional = true }
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.3"
@@ -48,4 +49,5 @@ requires = ["setuptools", "poetry", "poetry_core>=1.0", "cython"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.extras]
-full = ["Shapely", "pyproj", "SumoNetVis", "geopandas", "geoviews", "imageio-ffmpeg", "pyviz", "moviepy", "hvplot"]
+full = ["Shapely", "pyproj", "adjustText", "SumoNetVis", "geopandas",
+    "geoviews", "imageio-ffmpeg", "pyviz", "moviepy", "hvplot"]

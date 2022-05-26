@@ -1,4 +1,5 @@
 import pathlib
+import typing
 from typing import Optional, Tuple, List, Dict
 
 import matplotlib.patches
@@ -6,12 +7,16 @@ import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 import numpy
 
+
 import SumoNetVis
 import hvplot.pandas  # noqa
 import geopandas
 import holoviews
 from bokeh.resources import INLINE
+from matplotlib.figure import Figure
 from shapely.geometry import Point
+from adjustText import adjust_text
+
 
 from sumo_output_parsers.definition_parser.detectors_det_parser import DetectorDefinitionParser, \
     DetectorPositions, LanePosition
@@ -24,6 +29,10 @@ class DetectorPositionVisualizer(object):
                  path_sumo_detector: pathlib.Path):
         self.path_sumo_net = path_sumo_net
         self.detector_parsers = DetectorDefinitionParser(path_sumo_detector)
+        self.arrowprops_dict_default = {
+            'arrowstyle': '->',
+            'color': 'yellow'
+        }
 
     @staticmethod
     def clean_up_detector_id(detector_id: str) -> bool:
@@ -83,8 +92,10 @@ class DetectorPositionVisualizer(object):
         x_right_most_incoming = [t[2] for t in positions_incoming]
         y_right_most_incoming = [t[3] for t in positions_incoming]
 
-        positions_outgoing = [lane2lane_def[l_id].lane_position_xy.bounds for l_id in detector_definition.lane_object.lane_to
-                              if detector_definition.lane_object.sumo_net_vis_lane_obj.parentEdge.id != lane2lane_def[l_id].sumo_net_vis_lane_obj.parentEdge.id]
+        positions_outgoing = [lane2lane_def[l_id].lane_position_xy.bounds
+                              for l_id in detector_definition.lane_object.lane_to
+                              if detector_definition.lane_object.sumo_net_vis_lane_obj.parentEdge.id != \
+                              lane2lane_def[l_id].sumo_net_vis_lane_obj.parentEdge.id]
         x_smallest_out = [t[0] for t in positions_outgoing]
         y_smallest_out = [t[2] for t in positions_outgoing]
 
@@ -114,7 +125,8 @@ class DetectorPositionVisualizer(object):
         if lane_shape == 'left-right':
             if len(x_right_most_incoming) == 0:
                 # then, starting lane. Check out-going lane.
-                if all([True if x > xy_right_most_current[0] else False for x in x_smallest_out]):
+                # if all([True if x > xy_right_most_current[0] else False for x in x_smallest_out]):
+                if all([True if x > x_right_most_incoming else False for x in x_smallest_out]):
                     return Point(*detector_right), 'right'
                 else:
                     return Point(*detector_left), 'left'
@@ -155,7 +167,10 @@ class DetectorPositionVisualizer(object):
                 f"key {detector_def.lane_id} does not exist in net.xml definition."
             detector_def.lane_object = lane2lane_def[detector_def.lane_id]
             # decide detector position based on incoming lane information
+            if detector_def.detector_id == 'right0D0_1':
+                print()
             det_position, det_position_type = self.__decide_detector_position(detector_def, lane2lane_def)
+
             detector_def.detector_position_xy = det_position
             detector_def.detector_position_type = det_position_type
         # end for
@@ -220,34 +235,76 @@ class DetectorPositionVisualizer(object):
         return plot
 
     def visualize(self,
-                  path_save_png: pathlib.Path,
+                  target_detector_ids: Optional[Dict[str, typing.Optional[str]]] = None,
                   position_visualization: str = 'left',
-                  is_detector_name: bool = False) -> Axes:
+                  is_detector_name: bool = True,
+                  path_save_png: Optional[pathlib.Path] = None,
+                  ax: Optional[Axes] = None,
+                  fig_obj: Optional[Figure] = None,
+                  text_color: str = 'red',
+                  arrowprops_dict: typing.Dict[str, str] = None
+                  ) -> Axes:
         """Visualization of detector positions.
         Currently, the detector position is not exact but approximation.
         The visualization shows only lane where a detector stands.
 
         Args:
+            target_detector_ids: a list of detector-id and color of dot. Ex, [{'detector-id': 'red'}]. The color is a color-code of Matplotlib. Leave the color None if you do not specify a color.
             path_save_png: path to save png file.
             position_visualization: 'left', 'right', 'center'. The option on a lane to render a detector.
             is_detector_name: render detector name if True else nothing.
+            ax: matplotlib Axes object
+            fig_obj: matplotlib Figure object
+            text_color: text colors of detector-ids if is_detector_name is True
+            arrowprops_dict: arguments to arrowprops if is_detector_name is True
         Returns:
             ax: matplotlib layer object
         """
         assert position_visualization in ('left', 'right', 'center')
         detector_definitions, sumo_net = self._collect_detector_info()
         # visualizations
-        fig, ax = plt.subplots()
+        if ax is None:
+            fig_obj, ax = plt.subplots()
+        # end if
         # self.net.plot(ax=ax)
         sumo_net.plot(ax=ax)
+
+        if target_detector_ids is not None:
+            d_ids = target_detector_ids.keys()
+            detector_definitions = [d_obj for d_obj in detector_definitions if d_obj.detector_id in d_ids]
+        # end if
         # update detector object with lane positions
+        array_text = []
         for detector_def in detector_definitions:
             point_position: Point = detector_def.detector_position_xy
-            ax.scatter(point_position.x, point_position.y)
+
+            if target_detector_ids:
+                color_code = target_detector_ids[detector_def.detector_id]
+            else:
+                color_code = numpy.random.rand(3, )
+            # end if
+            ax.scatter(point_position.x, point_position.y, c=color_code)
             if is_detector_name:
-                ax.annotate(detector_def.detector_id, (point_position.x, point_position.y))
+                plt_text_obj = plt.text(point_position.x,
+                                        point_position.y,
+                                        s=detector_def.detector_id,
+                                        ha='center',
+                                        va='center',
+                                        color=text_color)
+                array_text.append(plt_text_obj)
             # end if
         # end for
-        fig.savefig(path_save_png.__str__(), bbox_inches='tight')
-        logger.info(f'saved at {path_save_png}')
+        if is_detector_name:
+            if arrowprops_dict is not None:
+                __arrow_dict = arrowprops_dict
+            else:
+                __arrow_dict = self.arrowprops_dict_default
+            # end if
+            adjust_text(array_text, arrowprops=__arrow_dict)
+
+        if path_save_png is not None:
+            fig_obj.savefig(path_save_png.__str__(), bbox_inches='tight')
+            logger.info(f'saved at {path_save_png}')
+        # end if
+
         return ax
