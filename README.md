@@ -15,7 +15,19 @@ This package provides an easy-to-call python interface to obtain matrix form fro
 - easy-to-call python interfaces to obtain matrix form from SUMO xml files
 - easy-to-call python interfaces to visualize SUMO simulations
 
+# Gallery
+
+You can generate a traffic animation by fcd output xml. 
+
 ![Example of animation](https://user-images.githubusercontent.com/1772712/135924848-4a938dd2-b2d3-4dfe-bfd6-94904086c382.gif)
+
+You can visualize where a detector locates in a network.
+
+![Visualization example of detector position](https://user-images.githubusercontent.com/1772712/170488284-79893a06-5979-45a0-a7c8-a87d9c89fa79.png)
+
+You can visualize a transition of vehicle by vehrout.xml.
+
+![Visualization example of traffic route](https://user-images.githubusercontent.com/1772712/170488281-3c7c5564-a3f2-403a-a9f5-779db6c7604f.png)
 
 # Install
 
@@ -34,7 +46,7 @@ pip install "sumo-output-parsers[full]"
 
 # Sample
 
-See `sample.py`
+See `sample.py` and `visualization_example.ipynb`
 
 # Test
 
