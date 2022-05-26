@@ -5,14 +5,11 @@ from typing import Optional, Tuple, List, Dict
 import matplotlib.patches
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
+import geopandas
 import numpy
 
 
 import SumoNetVis
-import hvplot.pandas  # noqa
-import geopandas
-import holoviews
-from bokeh.resources import INLINE
 from matplotlib.figure import Figure
 from shapely.geometry import Point
 from adjustText import adjust_text
@@ -207,7 +204,7 @@ class DetectorPositionVisualizer(object):
     def visualize_interactive(self,
                               path_save_html: pathlib.Path,
                               width: int = 600,
-                              height: int = 500) -> holoviews.core.overlay.Overlay:
+                              height: int = 500):
         """Visualization with interactive functions thank to hvplot.
 
         Args:
@@ -216,8 +213,12 @@ class DetectorPositionVisualizer(object):
             height: size of plot.
 
         Returns:
-            holoviews.core.overlay.Overlay
+            `holoviews.core.overlay.Overlay`
         """
+        from bokeh.resources import INLINE
+        import hvplot.pandas  # noqa
+        import holoviews
+
         assert path_save_html.parent.exists()
         detector_definitions, sumo_net = self._collect_detector_info()
         sumo_net_df = self._get_lanes_positions(sumo_net)

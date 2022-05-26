@@ -1,122 +1,97 @@
 <additional xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-
-<!-- Junction BOTTOM LEFT LEFT-->
-
-<e1Detector id="left0A0_0" lane="left0A0_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-<e1Detector id="left0A0_1" lane="left0A0_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-
-<e1Detector id="bottom0A0_1" lane="bottom0A0_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-<e1Detector id="bottom0A0_0" lane="bottom0A0_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-
-<e1Detector id="B0A0_1" lane="B0A0_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-<e1Detector id="B0A0_0" lane="B0A0_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-
-<e1Detector id="A1A0_1" lane="A1A0_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-<e1Detector id="A1A0_0" lane="A1A0_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-
-
-<!-- Junction BOTTOM LEFT MIDDLE-->
-
-<e1Detector id="B1B0_0" lane="B1B0_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-<e1Detector id="B1B0_1" lane="B1B0_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-
-<e1Detector id="C0B0_0" lane="C0B0_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-<e1Detector id="C0B0_1" lane="C0B0_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-
-<e1Detector id="bottom1B0_0" lane="bottom1B0_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-<e1Detector id="bottom1B0_1" lane="bottom1B0_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-
-<e1Detector id="A0B0_0" lane="A0B0_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-<e1Detector id="A0B0_1" lane="A0B0_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-
-
-<!-- Junction BOTTOM RIGHT MIDDLE-->
-
-<e1Detector id="C1C0_0" lane="C1C0_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-<e1Detector id="C1C0_1" lane="C1C0_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-
-<e1Detector id="D0C0_0" lane="D0C0_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-<e1Detector id="D0C0_1" lane="D0C0_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-
-<e1Detector id="bottom2C0_0" lane="bottom2C0_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-<e1Detector id="bottom2C0_1" lane="bottom2C0_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-
-<e1Detector id="B0C0_0" lane="B0C0_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-<e1Detector id="B0C0_1" lane="B0C0_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-
-
-<!-- Junction BOTTOM RIGHT RIGHT-->
-
-<e1Detector id="D1D0_0" lane="D1D0_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-<e1Detector id="D1D0_1" lane="D1D0_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-
-<e1Detector id="right0D0_0" lane="right0D0_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-<e1Detector id="right0D0_1" lane="right0D0_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-
-<e1Detector id="bottom3D0_0" lane="bottom3D0_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-<e1Detector id="bottom3D0_1" lane="bottom3D0_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-
-<e1Detector id="C0D0_0" lane="C0D0_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-<e1Detector id="C0D0_1" lane="C0D0_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-
-
-<!-- Junction TOP LEFT LEFT-->
-
-<e1Detector id="top0A1_0" lane="top0A1_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-<e1Detector id="top0A1_1" lane="top0A1_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-
-<e1Detector id="B1A1_0" lane="B1A1_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-<e1Detector id="B1A1_1" lane="B1A1_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-
-<e1Detector id="A0A1_0" lane="A0A1_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-<e1Detector id="A0A1_1" lane="A0A1_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-
-<e1Detector id="left1A1_0" lane="left1A1_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-<e1Detector id="left1A1_1" lane="left1A1_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-
-
-<!-- Junction TOP LEFT MIDDLE-->
-
-<e1Detector id="top1B1_0" lane="top1B1_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-<e1Detector id="top1B1_1" lane="top1B1_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-
-<e1Detector id="C1B1_0" lane="C1B1_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-<e1Detector id="C1B1_1" lane="C1B1_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-
-<e1Detector id="B0B1_0" lane="B0B1_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-<e1Detector id="B0B1_1" lane="B0B1_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-
-<e1Detector id="A1B1_0" lane="A1B1_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-<e1Detector id="A1B1_1" lane="A1B1_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-
-
-<!-- Junction TOP RIGHT MIDDLE-->
-
-<e1Detector id="top2C1_0" lane="top2C1_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-<e1Detector id="top2C1_1" lane="top2C1_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-
-<e1Detector id="D1C1_0" lane="D1C1_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-<e1Detector id="D1C1_1" lane="D1C1_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-
-<e1Detector id="C0C1_0" lane="C0C1_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-<e1Detector id="C0C1_1" lane="C0C1_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-
-<e1Detector id="B1C1_0" lane="B1C1_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-<e1Detector id="B1C1_1" lane="B1C1_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-
-
-<!-- Junction TOP RIGHT RIGHT-->
-
-<e1Detector id="top3D1_0" lane="top3D1_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-<e1Detector id="top3D1_1" lane="top3D1_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-
-<e1Detector id="right1D1_0" lane="right1D1_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-<e1Detector id="right1D1_1" lane="right1D1_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-
-<e1Detector id="D0D1_0" lane="D0D1_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-<e1Detector id="D0D1_1" lane="D0D1_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-
-<e1Detector id="C1D1_0" lane="C1D1_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-<e1Detector id="C1D1_1" lane="C1D1_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
-
+    <e1Detector id="e1Detector_01-left_0_4" lane="01-left_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    <e1Detector id="e1Detector_01-left_1_5" lane="01-left_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    
+    <e1Detector id="e1Detector_03-left_0_10" lane="03-left_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    <e1Detector id="e1Detector_03-left_1_11" lane="03-left_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    
+    <e1Detector id="e1Detector_05-left_0_18" lane="05-left_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    <e1Detector id="e1Detector_05-left_1_19" lane="05-left_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    
+    <e1Detector id="e1Detector_07-left_0_24" lane="07-left_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    <e1Detector id="e1Detector_07-left_1_25" lane="07-left_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    
+    <e1Detector id="e1Detector_10-bottom_0_3" lane="10-bottom_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    <e1Detector id="e1Detector_10-bottom_1_2" lane="10-bottom_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    
+    <e1Detector id="e1Detector_12-bottom_0_9" lane="12-bottom_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    <e1Detector id="e1Detector_12-bottom_1_8" lane="12-bottom_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    
+    <e1Detector id="e1Detector_12-upper_0_6" lane="12-upper_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    <e1Detector id="e1Detector_12-upper_1_7" lane="12-upper_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    
+    <e1Detector id="e1Detector_14-bottom_0_17" lane="14-bottom_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    <e1Detector id="e1Detector_14-bottom_1_16" lane="14-bottom_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    
+    <e1Detector id="e1Detector_14-upper_0_12" lane="14-upper_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    <e1Detector id="e1Detector_14-upper_1_13" lane="14-upper_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    
+    <e1Detector id="e1Detector_16-bottom_0_27" lane="16-bottom_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    <e1Detector id="e1Detector_16-bottom_1_26" lane="16-bottom_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    
+    <e1Detector id="e1Detector_16-upper_0_20" lane="16-upper_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    <e1Detector id="e1Detector_16-upper_1_21" lane="16-upper_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    
+    <e1Detector id="e1Detector_18-upper_0_28" lane="18-upper_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    <e1Detector id="e1Detector_18-upper_1_29" lane="18-upper_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    
+    <e1Detector id="e1Detector_21-left_0_56" lane="21-left_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    <e1Detector id="e1Detector_21-left_1_57" lane="21-left_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    
+    <e1Detector id="e1Detector_21-right_0_9" lane="21-right_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    <e1Detector id="e1Detector_21-right_1_8" lane="21-right_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    
+    <e1Detector id="e1Detector_23-left_0_48" lane="23-left_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    <e1Detector id="e1Detector_23-left_1_49" lane="23-left_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    
+    <e1Detector id="e1Detector_23-right_0_15" lane="23-right_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    <e1Detector id="e1Detector_23-right_1_14" lane="23-right_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    
+    <e1Detector id="e1Detector_25-left_0_40" lane="25-left_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    <e1Detector id="e1Detector_25-left_1_41" lane="25-left_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    
+    <e1Detector id="e1Detector_25-right_0_23" lane="25-right_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    <e1Detector id="e1Detector_25-right_1_22" lane="25-right_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    
+    <e1Detector id="e1Detector_27-left_0_32" lane="27-left_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    <e1Detector id="e1Detector_27-left_1_33" lane="27-left_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    
+    <e1Detector id="e1Detector_27-right_0_31" lane="27-right_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    <e1Detector id="e1Detector_27-right_1_30" lane="27-right_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    
+    <e1Detector id="e1Detector_30-bottom_0_63" lane="30-bottom_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    <e1Detector id="e1Detector_30-bottom_1_62" lane="30-bottom_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    
+    <e1Detector id="e1Detector_32-bottom_0_55" lane="32-bottom_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    <e1Detector id="e1Detector_32-bottom_1_54" lane="32-bottom_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    
+    <e1Detector id="e1Detector_32-upper_0_58" lane="32-upper_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    <e1Detector id="e1Detector_32-upper_1_59" lane="32-upper_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    
+    <e1Detector id="e1Detector_34-bottom_0_43" lane="34-bottom_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    <e1Detector id="e1Detector_34-bottom_1_42" lane="34-bottom_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    
+    <e1Detector id="e1Detector_34-upper_0_50" lane="34-upper_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    <e1Detector id="e1Detector_34-upper_1_51" lane="34-upper_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    
+    <e1Detector id="e1Detector_36-bottom_0_35" lane="36-bottom_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    <e1Detector id="e1Detector_36-bottom_1_34" lane="36-bottom_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    
+    <e1Detector id="e1Detector_36-upper_0_44" lane="36-upper_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    <e1Detector id="e1Detector_36-upper_1_45" lane="36-upper_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    
+    <e1Detector id="e1Detector_38-upper_0_36" lane="38-upper_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    <e1Detector id="e1Detector_38-upper_1_37" lane="38-upper_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    
+    <e1Detector id="e1Detector_41-right_0_61" lane="41-right_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    <e1Detector id="e1Detector_41-right_1_60" lane="41-right_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    
+    <e1Detector id="e1Detector_43-right_0_53" lane="43-right_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    <e1Detector id="e1Detector_43-right_1_52" lane="43-right_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    
+    <e1Detector id="e1Detector_45-right_0_47" lane="45-right_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    <e1Detector id="e1Detector_45-right_1_46" lane="45-right_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    
+    <e1Detector id="e1Detector_47-right_0_39" lane="47-right_0" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
+    <e1Detector id="e1Detector_47-right_1_38" lane="47-right_1" pos="-1" freq="1" file="loop.out.xml" friendlyPos="True"/>
 </additional>
