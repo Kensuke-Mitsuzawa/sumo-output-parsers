@@ -78,7 +78,8 @@ class DetectorPositionVisualizer(object):
         return lane_def
 
     @staticmethod
-    def __decide_detector_position(detector_definition: DetectorPositions,
+    def __decide_detector_position(net_obj: SumoNetVis.Net,
+                                   detector_definition: DetectorPositions,
                                    lane2lane_def: Dict[str, LanePosition]) -> Tuple[Point, str]:
         """Decide a detector position 'left-hand' or 'right-hand' on a lane.
         The algorithm is that
@@ -86,28 +87,45 @@ class DetectorPositionVisualizer(object):
         if all incoming-lanes have bigger x positions, then the detector position is 'left-hand'.
         else 'unknown', then returns center of the lane.
         """
+        edge_id = detector_definition.lane_object.edge_id
+        incoming_junction_shape = net_obj.edges[edge_id].from_junction
+        outgoing_junction_shape = net_obj.edges[edge_id].to_junction
+
+        lane_shape = ''  # left-right contain diagonal shapes. top-bottom are only when an angle is at 90 degrees
+        edge_end = ''  # left, right, top, bottom
+
+        diff_x_pos = abs(
+            outgoing_junction_shape.shape.centroid.bounds[0] - incoming_junction_shape.shape.centroid.bounds[0])
+        diff_y_pos = abs(
+            outgoing_junction_shape.shape.centroid.bounds[1] - incoming_junction_shape.shape.centroid.bounds[1])
+        # left-right or top-down is based on which has bigger difference value.
+        if diff_x_pos > diff_y_pos:
+            if outgoing_junction_shape.shape.centroid.bounds[0] > incoming_junction_shape.shape.centroid.bounds[0]:
+                # bounds are a tuple of (x-left, y-bottom, x-right, y-top)
+                lane_shape = 'left-right'
+                edge_end = 'right'
+            elif outgoing_junction_shape.shape.centroid.bounds[0] < incoming_junction_shape.shape.centroid.bounds[0]:
+                lane_shape = 'left-right'
+                edge_end = 'left'
+        else:
+            if outgoing_junction_shape.shape.centroid.bounds[1] < incoming_junction_shape.shape.centroid.bounds[1]:
+                lane_shape = 'top-down'
+                edge_end = 'down'
+            if outgoing_junction_shape.shape.centroid.bounds[1] > incoming_junction_shape.shape.centroid.bounds[1]:
+                lane_shape = 'top-down'
+                edge_end = 'top'
+
         incoming_lanes = detector_definition.lane_object.lane_from
         positions_incoming = [lane2lane_def[l_id].lane_position_xy.bounds for l_id in incoming_lanes
                               if detector_definition.lane_object.sumo_net_vis_lane_obj.parentEdge.id != lane2lane_def[l_id].sumo_net_vis_lane_obj.parentEdge.id]
-        x_right_most_incoming = [t[2] for t in positions_incoming]
-        y_right_most_incoming = [t[3] for t in positions_incoming]
 
         positions_outgoing = [lane2lane_def[l_id].lane_position_xy.bounds
                               for l_id in detector_definition.lane_object.lane_to
                               if detector_definition.lane_object.sumo_net_vis_lane_obj.parentEdge.id != \
                               lane2lane_def[l_id].sumo_net_vis_lane_obj.parentEdge.id]
-        x_smallest_out = [t[0] for t in positions_outgoing]
-        y_smallest_out = [t[2] for t in positions_outgoing]
 
         xy_current_lane_bound = detector_definition.lane_object.lane_position_xy.bounds
         xy_right_most_current = (xy_current_lane_bound[2], xy_current_lane_bound[3])
-        is_x_current_lane_big = [True if x_in < xy_right_most_current[0] else False for x_in in x_right_most_incoming
-                                 if x_in != xy_right_most_current[0]]
-        is_y_current_lane_big = [True if y_in < xy_right_most_current[1] else False for y_in in y_right_most_incoming
-                                 if y_in != xy_right_most_current[1]]
-        lane_shape = 'left-right' \
-            if abs(xy_current_lane_bound[2] - xy_current_lane_bound[0]) > abs(xy_current_lane_bound[3] - xy_current_lane_bound[1]) \
-            else 'top-down'
 
         detector_top = numpy.mean([
             [xy_current_lane_bound[0], xy_current_lane_bound[3]],
@@ -123,36 +141,15 @@ class DetectorPositionVisualizer(object):
             [xy_current_lane_bound[2], xy_current_lane_bound[3]]], axis=0)
 
         if lane_shape == 'left-right':
-            if len(x_right_most_incoming) == 0:
-                # then, starting lane. Check out-going lane.
-                # if all([True if x > xy_right_most_current[0] else False for x in x_smallest_out]):
-                if all([True if x > x_right_most_incoming else False for x in x_smallest_out]):
-                    return Point(*detector_right), 'right'
-                else:
-                    return Point(*detector_left), 'left'
-                # end if
-            elif all(is_x_current_lane_big):
+            if edge_end == 'right':
                 return Point(*detector_right), 'right'
-            elif all(not x for x in is_x_current_lane_big):
+            else:
                 return Point(*detector_left), 'left'
-            else:
-                logger.warning(f'{detector_definition.detector_id} is out-of rules. Set centroid instead.')
-                return detector_definition.lane_object.lane_position_xy.centroid, 'centroid'
         else:
-            if len(y_right_most_incoming) == 0:
-                # then, starting lane. Check out-going lane.
-                if all([True if y > xy_right_most_current[1] else False for y in y_smallest_out]):
-                    return Point(*detector_top), 'top'
-                else:
-                    return Point(*detector_down), 'down'
-                # end if
-            elif all(is_y_current_lane_big):
+            if edge_end == 'top':
                 return Point(*detector_top), 'top'
-            elif all(not y for y in is_y_current_lane_big):
-                return Point(*detector_down), 'down'
             else:
-                logger.warning(f'{detector_definition.detector_id} is out-of rules. Set centroid instead.')
-                return detector_definition.lane_object.lane_position_xy.centroid, 'centroid'
+                return Point(*detector_down), 'down'
 
     def _collect_detector_info(self) -> Tuple[List[DetectorPositions], SumoNetVis.Net]:
         # get definition of detectors
@@ -167,9 +164,7 @@ class DetectorPositionVisualizer(object):
                 f"key {detector_def.lane_id} does not exist in net.xml definition."
             detector_def.lane_object = lane2lane_def[detector_def.lane_id]
             # decide detector position based on incoming lane information
-            if detector_def.detector_id == 'right0D0_1':
-                print()
-            det_position, det_position_type = self.__decide_detector_position(detector_def, lane2lane_def)
+            det_position, det_position_type = self.__decide_detector_position(net, detector_def, lane2lane_def)
 
             detector_def.detector_position_xy = det_position
             detector_def.detector_position_type = det_position_type
